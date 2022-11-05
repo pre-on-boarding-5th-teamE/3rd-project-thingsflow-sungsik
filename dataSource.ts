@@ -13,7 +13,6 @@ const dataSource = new DataSource({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
   entities: [Users, Boards],
-  migrations: [__dirname + '/src/migrations/*.ts'],
   charset: 'utf8mb4',
   synchronize: false,
   logging: true,

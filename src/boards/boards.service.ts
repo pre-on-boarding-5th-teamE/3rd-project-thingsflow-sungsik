@@ -27,7 +27,7 @@ export class BoardsService {
   async getBoardListByCursor(postId: number) {
     return await this.boardsRepository
       .createQueryBuilder()
-      .where('id < :postId', { postId: postId })
+      .where('id < :cursor', { cursor: postId })
       .orderBy('createdAt', 'DESC')
       .limit(20)
       .getMany();

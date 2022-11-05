@@ -17,7 +17,6 @@ import { WeatherModule } from './weather/weather.module';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       entities: [Boards, Users],
-      migrations: [__dirname + '/src/migrations/*.ts'],
       charset: 'utf8mb4',
       synchronize: false,
       logging: true,

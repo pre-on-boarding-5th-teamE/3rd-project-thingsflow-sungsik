@@ -9,30 +9,34 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { BoardsService } from './boards.service';
 import { CreatePostDto } from './dto/createPost.request.dto';
 
+@ApiTags('BOARDS')
 @Controller('api/boards')
 export class BoardsController {
   constructor(private readonly boardsService: BoardsService) {}
 
-  // 게시물 리스트 첫 요청 시
+  @ApiOperation({ summary: '첫 요청 시: 게시물 리스트 가져오기 (limit: 20)' })
   @Get('all')
   async getBoardList() {
     return await this.boardsService.getBoardList();
   }
 
-  //이후 요청 시 받은 게시물 리스트의 마지막 게시물 아이디를 파라미터에 담아 요청
+  @ApiOperation({ summary: '이후 요청 시: 게시물 리스트 가져오기 (limit: 20)' })
   @Get('all/:postId/')
   async getBoardListByCursor(@Param('postId', ParseIntPipe) postId: number) {
     return await this.boardsService.getBoardListByCursor(postId);
   }
 
+  @ApiOperation({ summary: '특정 게시물의 상세 정보 가져오기' })
   @Get('detail/:postId')
   async getBoardDetails(@Param('postId', ParseIntPipe) postId: number) {
     return await this.boardsService.getBoardDetails(postId);
   }
 
+  @ApiOperation({ summary: '게시물 생성하기' })
   @Post(':userId')
   async createPost(
     @Param('userId') userId: number,
@@ -46,6 +50,7 @@ export class BoardsController {
     );
   }
 
+  @ApiOperation({ summary: '특정 게시물 수정하기' })
   @Patch(':postId')
   async updatePost(
     @Param('postId', ParseIntPipe) postId: number,
@@ -59,6 +64,7 @@ export class BoardsController {
     );
   }
 
+  @ApiOperation({ summary: '특정 게시물 삭제하기' })
   @Delete(':postId')
   async deletePost(
     @Param('postId', ParseIntPipe) postId: number,
