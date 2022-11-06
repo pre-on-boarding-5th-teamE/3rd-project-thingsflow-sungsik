@@ -10,5 +10,6 @@ import { BoardsService } from './boards.service';
   imports: [WeatherModule, TypeOrmModule.forFeature([Boards, Users])],
   controllers: [BoardsController],
   providers: [BoardsService],
+  exports: [BoardsService, TypeOrmModule.forFeature([Boards, Users])],
 })
 export class BoardsModule {}

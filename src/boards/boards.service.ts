@@ -4,16 +4,19 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Boards } from 'src/entities/Boards';
+import { Boards } from '../entities/Boards';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { WeatherService } from 'src/weather/weather.service';
+import { WeatherService } from '../weather/weather.service';
+import { Users } from '../entities/Users';
 
 @Injectable()
 export class BoardsService {
   constructor(
     @InjectRepository(Boards)
     private boardsRepository: Repository<Boards>,
+    @InjectRepository(Users)
+    private usersRepository: Repository<Users>,
     private weatherService: WeatherService,
   ) {}
 
@@ -43,6 +46,10 @@ export class BoardsService {
     content: string,
     password: string,
   ) {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException();
+    }
     const hashedPassword = await bcrypt.hash(password, 12);
     const getWeather = await this.weatherService.getWeatherInSeoul();
     const weather = getWeather.current.condition.text;
