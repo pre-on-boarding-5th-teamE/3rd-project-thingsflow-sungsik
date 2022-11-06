@@ -5,6 +5,7 @@ import { Boards } from '../entities/Boards';
 import { BoardsService } from './boards.service';
 import { WeatherService } from '../weather/weather.service';
 import { HttpModule } from '@nestjs/axios';
+import { NotFoundException } from '@nestjs/common';
 
 class MockBoardsRepository {
   #data = [
@@ -16,8 +17,8 @@ class MockBoardsRepository {
     const data = this.#data.reverse();
     return data;
   }
-  findOne({ where: postId }) {
-    const data = this.#data.find((v) => (v.id = postId));
+  findOne({ where: { id: postId } }) {
+    const data = this.#data.find((v) => v.id === postId);
     if (data) {
       return data;
     }
@@ -27,8 +28,8 @@ class MockBoardsRepository {
 
 class MockUsersRepository {
   #data = [{ id: 1, email: 'walter811@naver.com' }];
-  findOne({ where: userId }) {
-    const data = this.#data.find((v) => (v.id = userId));
+  findOne({ where: { id: userId } }) {
+    const data = this.#data.find((v) => v.id === userId);
     if (data) {
       return data;
     }
@@ -64,7 +65,7 @@ describe('BoardsService', () => {
   });
 
   it('getBoardList는 게시물 리스트 객체의 배열을 반환해야 함', () => {
-    expect(boardsService.getBoardList()).resolves.toStrictEqual([
+    expect(boardsService.getBoardList()).resolves.toEqual([
       { id: 3, createdAt: '2022-11-04T14:58:57.429Z' },
       { id: 2, createdAt: '2022-11-04T14:58:56.703Z' },
       { id: 1, createdAt: '2022-11-04T14:58:55.524Z' },
@@ -72,9 +73,9 @@ describe('BoardsService', () => {
   });
 
   it('getBoardDetails는 postId에 맞는 게시물을 반환해야 함', () => {
-    expect(boardsService.getBoardDetails(2)).resolves.toStrictEqual({
-      id: 2,
+    expect(boardsService.getBoardDetails(2)).resolves.toEqual({
       createdAt: '2022-11-04T14:58:56.703Z',
+      id: 2,
     });
   });
 
@@ -85,38 +86,24 @@ describe('BoardsService', () => {
   it('createPost는 userId에 맞는 user 데이터를 반환해야 함', () => {
     expect(
       boardsService.createPost(1, 'title', 'content', 'password'),
-    ).resolves.toStrictEqual({ id: 1, email: 'walter811@naver.com' });
+    ).resolves.toEqual({ id: 1, email: 'walter811@naver.com' });
   });
 
   it('createPost는 user를 못 찾으면 null을 반환해야 함', () => {
     expect(
       boardsService.createPost(10, 'title', 'content', 'password'),
-    ).resolves.toBe(null);
-  });
-
-  it('updatePost는 게시물 유무 판단 시 postId에 맞는 게시물을 반환해야 함', () => {
-    expect(
-      boardsService.updatePost(2, 'title', 'content', 'password'),
-    ).resolves.toStrictEqual({
-      id: 2,
-      createdAt: '2022-11-04T14:58:56.703Z',
-    });
+    ).rejects.toBeInstanceOf(NotFoundException);
   });
 
   it('updatePost는 게시물 유무 판단 시 게시물을 못 찾으면 null을 반환해야 함', () => {
     expect(
       boardsService.updatePost(4, 'title', 'content', 'password'),
-    ).resolves.toBe(null);
-  });
-
-  it('deletePost는 게시물 유무 판단 시 postId에 맞는 게시물을 반환해야 함', () => {
-    expect(boardsService.deletePost(2, 'password')).resolves.toStrictEqual({
-      id: 2,
-      createdAt: '2022-11-04T14:58:56.703Z',
-    });
+    ).rejects.toBeInstanceOf(NotFoundException);
   });
 
   it('deletePost는 게시물 유무 판단 시 게시물을 못 찾으면 null을 반환해야 함', () => {
-    expect(boardsService.deletePost(4, 'password')).resolves.toBe(null);
+    expect(boardsService.deletePost(4, 'password')).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
   });
 });
